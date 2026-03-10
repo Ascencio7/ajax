@@ -1,0 +1,207 @@
+﻿@model ajax.Models.Shippers
+
+<h2>Shippers</h2>
+
+<hr />
+
+<input type="button" id="btnVer" value="Ver tabla" class="btn btn-success" />
+
+<input type="button"
+       id="btnNuevo"
+       value="Agregar Nuevo"
+       class="btn btn-primary"
+       data-toggle="modal"
+       data-target="#exampleModal" />
+
+<br />
+<br />
+
+<div id="result"></div>
+
+<div class="modal fade"
+     id="exampleModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Shippers</h5>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                @using (Html.BeginForm("Shippers", "Home", FormMethod.Post,
+                new { id = "formodal" }))
+                {
+
+                    <label>ShipperID</label>
+
+                    @Html.TextBoxFor(x => x.ShipperID,
+                    new { id = "txtShipperId", @class = "form-control" })
+
+                    <label>CompanyName</label>
+
+                    @Html.TextBoxFor(x => x.CompanyName,
+                    new { id = "txtCompanyName", @class = "form-control" })
+
+                    <label>Phone</label>
+
+                    @Html.TextBoxFor(x => x.Phone,
+                    new { id = "txtPhone", @class = "form-control" })
+
+                    @Html.HiddenFor(x => x.opcion,
+                    new { id = "txtOpcion" })
+
+                }
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal">
+
+                    Cerrar
+
+                </button>
+
+                <input type="button"
+                       id="btnGuardar"
+                       value="Guardar"
+                       class="btn btn-success" />
+
+                <input type="button"
+                       id="btnEliminar"
+                       value="Eliminar"
+                       class="btn btn-danger" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts{
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#btnVer").click(function () {
+
+                $.ajax({
+                    url: "/Home/getTabla",
+                    type: "GET",
+                    dataType: "json",
+
+                    success: function (respuesta) {
+
+                        console.log(respuesta);
+
+                        var tabla = "<table class='table'>" +
+                            "<tr>" +
+                            "<th>ID</th>" +
+                            "<th>Company</th>" +
+                            "<th>Phone</th>" +
+                            "</tr>";
+
+                        for (var i = 0; i < respuesta.result.length; i++) {
+
+                            tabla += "<tr>" +
+                                "<td>" + respuesta.result[i].ShipperID + "</td>" +
+                                "<td>" + respuesta.result[i].CompanyName + "</td>" +
+                                "<td>" + respuesta.result[i].Phone + "</td>" +
+                                "</tr>";
+
+                        }
+
+                        tabla += "</table>";
+
+                        $("#result").html(tabla);
+
+                    },
+
+                    error: function () {
+
+                        alert("Error al cargar datos");
+
+                    }
+
+                });
+
+            });
+
+            // Funcion para actualizar la tabla cada 5 segundos automaticamente
+            function cargarTabla() {
+
+                $.ajax({
+                    url: "/Home/getTabla",
+                    type: "GET",
+                    dataType: "json",
+
+                    success: function (respuesta) {
+
+                        var tabla = "<table class='table'>" +
+                            "<tr>" +
+                            "<th>ID</th>" +
+                            "<th>CompanyName</th>" +
+                            "<th>Phone</th>" +
+                            "</tr>";
+
+                        for (var i = 0; i < respuesta.result.length; i++) {
+
+                            tabla += "<tr>" +
+                                "<td>" + respuesta.result[i].ShipperID + "</td>" +
+                                "<td>" + respuesta.result[i].CompanyName + "</td>" +
+                                "<td>" + respuesta.result[i].Phone + "</td>" +
+                                "</tr>";
+
+                        }
+
+                        tabla += "</table>";
+
+                        $("#result").html(tabla);
+
+                    }
+
+                });
+
+            }
+
+            $(document).ready(function () {
+
+                cargarTabla();
+
+                setInterval(function () {
+
+                    cargarTabla();
+
+                }, 5000);
+
+            });
+            // Funcion para actualizar la tabla cada 5 segundos automaticamente
+
+        });
+
+    </script>
+
+}
