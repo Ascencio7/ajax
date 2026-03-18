@@ -8,16 +8,16 @@ namespace ajax.Models
     public class Shippers
     {
         public int ShipperID { get; set; }
-        public string CompanyName { get; set; }
+        public string ShipperName { get; set; }
         public string Phone { get; set; }
         public string opcion { get; set; }
 
         public Shippers() { }
 
-        public Shippers(int id, string com, string tel)
+        public Shippers(int id, string name, string tel)
         {
             this.ShipperID = id;
-            this.CompanyName = com;
+            this.ShipperName = name;
             this.Phone = tel;
         }
 

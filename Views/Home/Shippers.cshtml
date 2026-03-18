@@ -1,207 +1,242 @@
 ﻿@model ajax.Models.Shippers
 
-<h2>Shippers</h2>
+@{
+    ViewBag.Title = "Shippers";
+}
 
-<hr />
+<div class="container mt-4">
 
-<input type="button" id="btnVer" value="Ver tabla" class="btn btn-success" />
+    <h2 class="text-center text-primary">🚚 Gestión de Shippers</h2>
+    <hr />
 
-<input type="button"
-       id="btnNuevo"
-       value="Agregar Nuevo"
-       class="btn btn-primary"
-       data-toggle="modal"
-       data-target="#exampleModal" />
+    <div class="mb-3 text-center">
+        <button id="btnVer" class="btn btn-success me-2">📄 Ver tabla</button>
 
-<br />
-<br />
+        <!-- Se usa Bootstrap 5 -->
+        <button id="btnNuevo" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            ➕ Agregar Nuevo
+        </button>
+    </div>
 
-<div id="result"></div>
+    <div id="result" class="table-responsive shadow-sm"></div>
 
-<div class="modal fade"
-     id="exampleModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+</div>
 
+<!-- Modal del formulario, el ID se muestra pero NO SE INGRESA NI EDITA: Solo se usa para poder eliminar -->
+<div class="modal fade" id="exampleModal" tabindex="-1">
     <div class="modal-dialog">
+        <div class="modal-content shadow">
 
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h5 class="modal-title">Shippers</h5>
-
-                <button type="button"
-                        class="close"
-                        data-dismiss="modal">
-
-                    <span>&times;</span>
-
-                </button>
-
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Shipper</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
 
-                @using (Html.BeginForm("Shippers", "Home", FormMethod.Post,
-                new { id = "formodal" }))
+                @using (Html.BeginForm("Shippers", "Home", FormMethod.Post, new { id = "formodal" }))
                 {
+                    <div class="mb-2">
+                        <label>ID</label>
+                        @Html.TextBoxFor(x => x.ShipperID, new { id = "txtShipperId", @class = "form-control", @readonly = "readonly" })
+                    </div>
 
-                    <label>ShipperID</label>
+                    <div class="mb-2">
+                        <label>Shipper Name</label>
+                        @Html.TextBoxFor(x => x.ShipperName, new { id = "txtCompanyName", @class = "form-control" })
+                    </div>
 
-                    @Html.TextBoxFor(x => x.ShipperID,
-                    new { id = "txtShipperId", @class = "form-control" })
+                    <div class="mb-2">
+                        <label>Phone</label>
+                        @Html.TextBoxFor(x => x.Phone, new { id = "txtPhone", @class = "form-control" })
+                    </div>
 
-                    <label>CompanyName</label>
-
-                    @Html.TextBoxFor(x => x.CompanyName,
-                    new { id = "txtCompanyName", @class = "form-control" })
-
-                    <label>Phone</label>
-
-                    @Html.TextBoxFor(x => x.Phone,
-                    new { id = "txtPhone", @class = "form-control" })
-
-                    @Html.HiddenFor(x => x.opcion,
-                    new { id = "txtOpcion" })
-
+                    @Html.HiddenFor(x => x.opcion, new { id = "txtOpcion" })
                 }
 
             </div>
 
             <div class="modal-footer">
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal">
-
-                    Cerrar
-
-                </button>
-
-                <input type="button"
-                       id="btnGuardar"
-                       value="Guardar"
-                       class="btn btn-success" />
-
-                <input type="button"
-                       id="btnEliminar"
-                       value="Eliminar"
-                       class="btn btn-danger" />
-
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button id="btnGuardar" class="btn btn-success">Guardar</button>
+                <button id="btnEliminar" class="btn btn-danger">Eliminar</button>
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 
 @section scripts{
-
     <script>
+
+        function limpiarFormulario() {
+            $("#txtShipperId").val("");
+            $("#txtCompanyName").val("");
+            $("#txtPhone").val("");
+        }
+
+        function cargarDel(id, compa, tel) {
+            $("#txtShipperId").val(id);
+            $("#txtCompanyName").val(compa);
+            $("#txtPhone").val(tel);
+            $("#txtOpcion").val("eliminar");
+
+            $("#btnGuardar").hide();
+            $("#btnEliminar").show();
+        }
+
+        function cargarEdit(id, compa, tel) {
+            $("#txtShipperId").val(id);
+            $("#txtCompanyName").val(compa);
+            $("#txtPhone").val(tel);
+            $("#txtOpcion").val("editar");
+
+            $("#btnGuardar").show();
+            $("#btnEliminar").hide();
+        }
+
+        function cerrarModal() {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+            modal.hide();
+        }
+
+        function abrirModal() {
+            var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+            modal.show();
+        }
+
+        function cargarTabla() {
+            $.ajax({
+                url: "/Home/getTabla",
+                type: "GET",
+                dataType: "json",
+                success: function (respuesta) {
+
+                    var tabla = "<table class='table table-hover table-striped table-bordered'>" +
+                        "<thead class='table-dark'>" +
+                        "<tr><th>ID</th><th>Shipper</th><th>Phone</th><th>Acciones</th></tr></thead>";
+
+                    // Bucle para mostrar todos los datos de la tabla desde SQL Server
+                    // que se tengan registrados
+                    for (var i = 0; i < respuesta.result.length; i++) {
+
+                        tabla += "<tr>" +
+                            "<td>" + respuesta.result[i].ShipperID + "</td>" +
+                            "<td>" + respuesta.result[i].ShipperName + "</td>" +
+                            "<td>" + respuesta.result[i].Phone + "</td>" +
+                            "<td>" +
+
+                            "<button class='btn btn-warning btn-sm me-1 btn-editar' " +
+                            "data-id='" + respuesta.result[i].ShipperID + "' " +
+                            "data-name='" + respuesta.result[i].ShipperName + "' " +
+                            "data-phone='" + respuesta.result[i].Phone + "'>" +
+                            "Editar</button>" +
+
+                            "<button class='btn btn-danger btn-sm btn-eliminar' " +
+                            "data-id='" + respuesta.result[i].ShipperID + "' " +
+                            "data-name='" + respuesta.result[i].ShipperName + "' " +
+                            "data-phone='" + respuesta.result[i].Phone + "'>" +
+                            "Eliminar</button>" +
+
+                            "</td>" +
+                            "</tr>";
+                    }
+
+                    tabla += "</table>";
+                    $("#result").html(tabla);
+                }
+            });
+        }
 
         $(document).ready(function () {
 
-            $("#btnVer").click(function () {
+            cargarTabla();
+            setInterval(cargarTabla, 5000);
 
-                $.ajax({
-                    url: "/Home/getTabla",
-                    type: "GET",
-                    dataType: "json",
+            $("#btnEliminar").hide();
 
-                    success: function (respuesta) {
+            $("#btnVer").click(cargarTabla);
 
-                        console.log(respuesta);
+            // Boton de nuevo dato
+            $("#btnNuevo").click(function () {
+                limpiarFormulario();
+                $("#txtOpcion").val("guardar");
 
-                        var tabla = "<table class='table'>" +
-                            "<tr>" +
-                            "<th>ID</th>" +
-                            "<th>Company</th>" +
-                            "<th>Phone</th>" +
-                            "</tr>";
-
-                        for (var i = 0; i < respuesta.result.length; i++) {
-
-                            tabla += "<tr>" +
-                                "<td>" + respuesta.result[i].ShipperID + "</td>" +
-                                "<td>" + respuesta.result[i].CompanyName + "</td>" +
-                                "<td>" + respuesta.result[i].Phone + "</td>" +
-                                "</tr>";
-
-                        }
-
-                        tabla += "</table>";
-
-                        $("#result").html(tabla);
-
-                    },
-
-                    error: function () {
-
-                        alert("Error al cargar datos");
-
-                    }
-
-                });
-
+                $("#btnGuardar").show();
+                $("#btnEliminar").hide();
             });
 
-            // Funcion para actualizar la tabla cada 5 segundos automaticamente
-            function cargarTabla() {
+            $(document).on("click", ".btn-editar", function () {
+
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                var phone = $(this).data("phone");
+
+                cargarEdit(id, name, phone);
+                abrirModal();
+            });
+
+            // Eliminar con un click
+            $(document).on("click", ".btn-eliminar", function () {
+
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                var phone = $(this).data("phone");
+
+                cargarDel(id, name, phone);
+                abrirModal();
+            });
+
+            // Boton de guardar
+            $("#btnGuardar").click(function () {
+
+                if ($("#txtCompanyName").val() == "" || $("#txtPhone").val() == "") {
+                    alert("Completa los campos");
+                    return;
+                }
 
                 $.ajax({
-                    url: "/Home/getTabla",
-                    type: "GET",
-                    dataType: "json",
-
-                    success: function (respuesta) {
-
-                        var tabla = "<table class='table'>" +
-                            "<tr>" +
-                            "<th>ID</th>" +
-                            "<th>CompanyName</th>" +
-                            "<th>Phone</th>" +
-                            "</tr>";
-
-                        for (var i = 0; i < respuesta.result.length; i++) {
-
-                            tabla += "<tr>" +
-                                "<td>" + respuesta.result[i].ShipperID + "</td>" +
-                                "<td>" + respuesta.result[i].CompanyName + "</td>" +
-                                "<td>" + respuesta.result[i].Phone + "</td>" +
-                                "</tr>";
-
+                    type: "POST",
+                    url: "/Home/ShipperData",
+                    data: $("#formodal").serialize(),
+                    success: function (res) {
+                        if (res) {
+                            alert("Guardado correctamente");
+                            cerrarModal();
+                            cargarTabla();
+                        } else {
+                            alert("Error al guardar");
                         }
-
-                        tabla += "</table>";
-
-                        $("#result").html(tabla);
-
                     }
-
                 });
-
-            }
-
-            $(document).ready(function () {
-
-                cargarTabla();
-
-                setInterval(function () {
-
-                    cargarTabla();
-
-                }, 5000);
-
             });
-            // Funcion para actualizar la tabla cada 5 segundos automaticamente
+
+            // Boton de eliminar
+            $("#btnEliminar").click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/ShipperData",
+                    data: $("#formodal").serialize(),
+                    success: function (res) {
+                        if (res) {
+                            alert("Eliminado correctamente");
+                            cerrarModal();
+                            cargarTabla();
+                        } else {
+                            alert("Error al eliminar");
+                        }
+                    }
+                });
+            });
+
+            // Limpiar el modal
+            document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function () {
+                limpiarFormulario();
+            });
 
         });
 
     </script>
-
 }

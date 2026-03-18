@@ -10,14 +10,18 @@ namespace ajax.Models
     {
         SqlConnection con = new SqlConnection();
         SqlCommand cmd = new SqlCommand();
+        // Una variable que guarde la cadena de conexion a SQL Server
+        string cadena = "Data Source=VLADIMIR\\ASCENCIO;Initial Catalog=Northwind; Integrated Security=true";
+
 
         #region Conexion BD
         public ShippersBD()
         {
             this.con.ConnectionString =
-                @"Data Source=VLADIMIR\ASCENCIO;Initial Catalog=Northwind; Integrated Security=true";
+                @cadena;
         }
         #endregion
+
 
         #region Obtener tabla
         public List<Shippers> getTabla()
@@ -30,8 +34,10 @@ namespace ajax.Models
 
             while (lector.Read())
             {
-                data.Add(new Shippers(int.Parse(lector[0].ToString()),
-                lector[1].ToString(), lector[2].ToString()));
+                data.Add(new Shippers(
+                    int.Parse(lector[0].ToString()),
+                lector[1].ToString(), 
+                lector[2].ToString()));
             }
             cmd.Connection.Close();
             lector.Close();
@@ -39,11 +45,14 @@ namespace ajax.Models
         }
         #endregion
 
+
         #region Insertar
         public bool insertar(Shippers obj)
         {
             cmd.Connection = con;
-            cmd.CommandText = "INSERT INTO Shippers(CompanyName, Phone) values('" + obj.CompanyName + "','" + obj.Phone + "')"; cmd.Connection.Open();
+            cmd.CommandText = "INSERT INTO Shippers(ShipperName, Phone) VALUES('"
+                                + obj.ShipperName + "','" + obj.Phone + "')";
+            cmd.Connection.Open();
             int r = cmd.ExecuteNonQuery();
             cmd.Connection.Close();
 
@@ -57,6 +66,7 @@ namespace ajax.Models
             }
         }
         #endregion
+
 
         #region Eliminar
         public bool eliminar(Shippers obj)
@@ -77,5 +87,34 @@ namespace ajax.Models
             }
         }
         #endregion
+
+
+        #region Editar
+        public bool editar(Shippers obj)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(cadena))
+                {
+                    string query = "UPDATE Shippers SET ShipperName = @name, Phone = @phone WHERE ShipperID = @id";
+
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@name", obj.ShipperName);
+                    cmd.Parameters.AddWithValue("@phone", obj.Phone);
+                    cmd.Parameters.AddWithValue("@id", obj.ShipperID);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        #endregion
+
+
     }
 }

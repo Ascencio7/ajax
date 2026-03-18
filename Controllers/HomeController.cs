@@ -73,7 +73,9 @@ namespace ajax.Controllers
                         respuesta = false;
                     }
                     break;
-
+                case "editar":
+                    respuesta = bd.editar(obj);
+                    break;
                 case "eliminar":
                     if (bd.eliminar(obj))
                     {
