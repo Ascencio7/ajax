@@ -33,36 +33,27 @@ Este proyecto está diseñado como práctica de **desarrollo web de páginas web
   <img src="./images/app.png" alt="Captura de inicio" style="max-width: 600px; display:block; margin:auto;">
 </figure>
 
-## Datos ingresados
+## Agregar un nuevo dato (el campo ID se agregará automáticamente)
 
 <figure>
-  <img src="./images/datosB.png" alt="Captura de datos" style="max-width: 600px; display:block; margin:auto;">
+  <img src="./images/agregar.png" alt="Captura de datos" style="max-width: 600px; display:block; margin:auto;">
 </figure>
 
-## Mayores a 25 años
+## Editar un registro, sin alterar el ID
 <figure>
-  <img src="./images/mayores25.png" alt="Captura de mayores de 25" style="max-width: 600px; display:block; margin:auto;">
+  <img src="./images/editar.png" alt="Captura de mayores de 25" style="max-width: 600px; display:block; margin:auto;">
 </figure>
 
-## Rango de edades entre 23 y 25 años
+## Se eliminará el registro seleccionado
 <figure>
-  <img src="./images/rango.png" alt="Captura de rango de edades" style="max-width: 600px; display:block; margin:auto;">
+  <img src="./images/eliminar.png" alt="Captura de rango de edades" style="max-width: 600px; display:block; margin:auto;">
 </figure>
 
-## Total y promedio de las becas
+## Constancia de que en SQL Server se visualiza el nuevo dato, asi como si se edita o se elimina
 <figure>
-  <img src="./images/totales.png" alt="Captura de total y promedio" style="max-width: 600px; display:block; margin:auto;">
+  <img src="./images/base.png" alt="Captura de total y promedio" style="max-width: 600px; display:block; margin:auto;">
 </figure>
 
-## Estudiantes con apellido con "re"
-<figure>
-  <img src="./images/apellidosRe.png" alt="Captura de estudiantes con apellido re" style="max-width: 600px; display:block; margin:auto;">
-</figure>
-
-## El nombre más largo registrado
-<figure>
-  <img src="./images/nombreLargo.png" alt="Captura del nombre más largo" style="max-width: 600px; display:block; margin:auto;">
-</figure>
 
 
 <br>
